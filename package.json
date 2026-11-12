@@ -1,6 +1,6 @@
 {
   "name": "tisa-zalo",
-  "version": "1.9.1",
+  "version": "1.11.0",
   "description": "Zalo CLI and MCP server used by TISA OS: QR sign-in, multi-account, read and send messages, group notes, reminders and polls.",
   "type": "module",
   "bin": {
