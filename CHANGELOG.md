@@ -2,6 +2,31 @@
 
 All notable changes to tisa-zalo. Newest first.
 
+## [1.14.0] - 2026-11-20
+
+### Fixed
+- **The history keeps a link card's link.** `zalo_get_history`, `zalo_search_history` and `history.jsonl` now carry
+  the same `attachment` (`type`, `url`, `description`) as the live feed, so a link card filed in the history keeps
+  its URL and title instead of only the page's description. TISA field report, 20/11/2026: a claude.ai link was
+  stored as "Try out Artifacts created by Claude users" alone.
+
+### Added
+- **The live feed reports who was tagged** (`mentions`, the same uid list as the history), so a tag inside a link
+  card, which leaves no "@Name" in the text, can still be recognised. `null` when nobody was tagged.
+
+## [1.13.0] - 2026-11-19
+
+### Added
+- **`zalo_send_link`: a link goes out as a link card.** The message shows the page's title, description and
+  thumbnail under the text, as when a person types a link in the Zalo app. TISA owner report, 19/11/2026: a link
+  TISA sent showed as bare text. The card is built by the sender (Zalo reads the page with `parseLink`, then a
+  link message carries the result), so a plain `zalo_send_message` with a URL in it can never show one.
+  - Parameters: `threadId`, `url` (http or https), optional `text` (the link is appended when the text lacks it)
+    and `threadType`.
+  - When Zalo cannot read a preview for the page, the same text goes out as a plain message and the result says
+    `preview: false`. A failed send of the card itself is reported, never retried as plain text, so the contact
+    cannot get the message twice.
+
 ## [1.12.0] - 2026-11-18
 
 ### Fixed

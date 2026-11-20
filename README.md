@@ -49,7 +49,8 @@ tisa-zalo mcp start --http 3847 --auth <token>   # HTTP, bound to 127.0.0.1
 Tools: `zalo_get_messages`, `zalo_get_history`, `zalo_search_history`, `zalo_list_threads`,
 `zalo_search_threads`, `zalo_view_media`, `zalo_get_group_joins`, `zalo_list_join_requests`,
 `zalo_get_labels` (read),
-`zalo_mark_read` (write), `zalo_send_message` (sends a message), `zalo_send_file` (sends files),
+`zalo_mark_read` (write), `zalo_send_message` (sends a message), `zalo_send_link` (sends a link as a
+card with the page's title and thumbnail), `zalo_send_file` (sends files),
 `zalo_add_reaction` (puts an emoji reaction on a message, or takes it off) and
 `zalo_review_join_requests` (approves or rejects people waiting to join a group; needs owner or deputy
 rights).

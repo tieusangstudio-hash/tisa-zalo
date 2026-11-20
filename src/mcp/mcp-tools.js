@@ -1,7 +1,7 @@
 /**
  * MCP tool registrations for Zalo message access and sending.
- * Registers 15 tools: zalo_get_messages, zalo_get_history, zalo_search_history, zalo_send_message,
- * zalo_send_typing, zalo_send_file, zalo_add_reaction, zalo_list_threads, zalo_search_threads, zalo_mark_read, zalo_view_media,
+ * Registers 16 tools: zalo_get_messages, zalo_get_history, zalo_search_history, zalo_send_message,
+ * zalo_send_link, zalo_send_typing, zalo_send_file, zalo_add_reaction, zalo_list_threads, zalo_search_threads, zalo_mark_read, zalo_view_media,
  * zalo_get_group_joins, zalo_list_join_requests, zalo_review_join_requests, zalo_get_labels.
  */
 
@@ -13,6 +13,7 @@ import { createLabelReader, labelsOfThread } from "./labels.js";
 import { REACTIONS, reactToMessage } from "./reactions.js";
 import { MAX_FILES_PER_SEND, sendFileFromOutbox } from "./send-file.js";
 import { buildQuote } from "./reply-quote.js";
+import { sendLinkCard } from "./send-link.js";
 import { OUTBOX_DIR } from "../core/send-files.js";
 import { getApi, isLoggedIn } from "../core/zalo-client.js";
 
@@ -193,6 +194,43 @@ export function registerTools(server, api, buffer, filter, config, nameCache, hi
                 return ok({ success: true, messageId });
             } catch (e) {
                 console.error("[mcp-tools] zalo_send_message error:", e.message);
+                return err(e.message);
+            }
+        },
+    );
+
+    // --- zalo_send_link ---
+    server.registerTool(
+        "zalo_send_link",
+        {
+            title: "Send Zalo Link with Preview",
+            description:
+                "Send a link to a Zalo thread as a link card (page title, description and thumbnail under the text), " +
+                "the way the Zalo app sends a message a person typed with a link in it. " +
+                "`text` is the message shown above the card; the link is added at its end when it is not already in it. " +
+                "When Zalo cannot read a preview for the link, the same text goes out as a plain message instead " +
+                "(`preview: false` in the result). No text styles, no mentions. threadType: 0=DM(User), 1=Group.",
+            inputSchema: z.object({
+                threadId: z.string().describe("Thread ID to send to"),
+                url: z
+                    .string()
+                    .regex(/^https?:\/\/\S+$/i, "url must start with http:// or https://")
+                    .describe("The link to preview (http or https)"),
+                text: z.string().default("").describe("Message text shown with the card; may contain the link"),
+                threadType: z
+                    .number()
+                    .int()
+                    .min(0)
+                    .max(1)
+                    .default(THREAD_USER)
+                    .describe("Thread type: 0=DM(User), 1=Group"),
+            }),
+        },
+        async (args) => {
+            try {
+                return ok(await sendLinkCard(live(), args));
+            } catch (e) {
+                console.error("[mcp-tools] zalo_send_link error:", e.message);
                 return err(e.message);
             }
         },
